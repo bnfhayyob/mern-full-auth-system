@@ -11,6 +11,7 @@ connectDB()
 
 app.use(express.json())
 app.use(cookieParser())
+app.use(express.urlencoded({ extended: true })) // For parsing URL-encoded data
 app.use(cors({credentials:true}))
 
 //API Endpoints

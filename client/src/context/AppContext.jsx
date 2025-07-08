@@ -14,21 +14,16 @@ export const AppContextProvider = (props) =>{
 
     const getAuthState = async () => {
         try {
-            console.log('Checking auth state...')
             const {data} = await axios.get(backendUrl + '/api/auth/is-auth')
-            console.log('Auth state response:', data)
             
             if(data.success || data.sucess){  // Handle both spellings temporarily
-                console.log('User is authenticated, setting logged in state')
                 setIsLoggedin(true)
                 getUserData()
             } else {
-                console.log('User is not authenticated')
                 setIsLoggedin(false)
                 setUserData(false)
             }
         } catch (error) {
-            console.error('Auth check error:', error)
             setIsLoggedin(false)
             setUserData(false)
             // Don't show toast error for auth check failures
@@ -38,7 +33,6 @@ export const AppContextProvider = (props) =>{
     const getUserData = async () => {
         try {
             const {data} = await axios.get(backendUrl + '/api/user/data')
-            console.log(data)
             data.success ? setUserData(data.userDate) : toast.error(data.message)
         } catch (error) {
             toast.error(error.message)

@@ -150,9 +150,22 @@ export const verifyEmail = async (req,res) => {
 //check if user is authenticated
 export const isAuthenticated = async (req,res) => {
     try {
-        return res.json({sucess:true})
+        const token = req.cookies.token
+        
+        if (!token) {
+            return res.json({success: false, message: 'No token found'})
+        }
+        
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        const user = await userModel.findById(decoded.id)
+        
+        if (!user) {
+            return res.json({success: false, message: 'User not found'})
+        }
+        
+        return res.json({success: true, message: 'User is authenticated'})
     } catch (error) {
-        return res.json({sucess:false,message:error.message})
+        return res.json({success: false, message: error.message})
     }
 }
 //Send password reset OTP

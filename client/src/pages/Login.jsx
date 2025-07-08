@@ -8,7 +8,7 @@ import axios from 'axios'
 const login = () => {
 
     const navigate = useNavigate()
-    const {backendUrl,setIsLoggedin} = useContext(AppContent)
+    const {backendUrl,setIsLoggedin,getUserData} = useContext(AppContent)
 
     const [state, setState] = useState('Sign Up')
     const [name,setName] = useState('')
@@ -16,41 +16,31 @@ const login = () => {
     const [password,setPassword] = useState('')
 
     const onSubmitHandler = async (e) => {
-        e.preventDefault() // Move this to the top
-        console.log('Form submitted with state:', state)
-        console.log('Email:', email, 'Password:', password)
+        e.preventDefault() 
         
         try {
             axios.defaults.withCredentials = true
 
             if(state === 'Sign Up'){
-                console.log('Attempting sign up...')
                 const {data} = await axios.post(backendUrl + '/api/auth/register', {name,email,password})
-                console.log('Sign up response:', data)
                 if(data.success){
-                    console.log('Sign up successful, navigating to home')
                     setIsLoggedin(true)
+                    getUserData()
                     navigate('/')
                 } else {
-                    console.log('Sign up failed:', data.message)
                     toast.error(data.message)
                 }
             } else {
-                console.log('Attempting login...')
                 const {data} = await axios.post(backendUrl + '/api/auth/login', {email,password})
-                console.log('Login response:', data)
                 if(data.success){
-                    console.log('Login successful, navigating to home')
                     setIsLoggedin(true)
+                    getUserData()
                     navigate('/')
                 } else {
-                    console.log('Login failed:', data.message)
                     toast.error(data.message)
                 }
             }
         } catch (error) {
-            console.error('Request error:', error)
-            console.error('Error response:', error.response?.data)
             toast.error(error.response?.data?.message || 'An error occurred')
         }
     }

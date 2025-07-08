@@ -1,15 +1,59 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { assets } from '../../assets/assets'
 import { useNavigate } from 'react-router-dom'
+import { AppContent } from '../context/AppContext'
+import axios from 'axios'
+  import { toast } from 'react-toastify';
 
 const login = () => {
 
     const navigate = useNavigate()
+    const {backendUrl,setIsLoggedin} = useContext(AppContent)
 
     const [state, setState] = useState('Sign Up')
     const [name,setName] = useState('')
     const [email,setEmail] = useState('')
     const [password,setPassword] = useState('')
+
+    const onSubmitHandler = async (e) => {
+        e.preventDefault() // Move this to the top
+        console.log('Form submitted with state:', state)
+        console.log('Email:', email, 'Password:', password)
+        
+        try {
+            axios.defaults.withCredentials = true
+
+            if(state === 'Sign Up'){
+                console.log('Attempting sign up...')
+                const {data} = await axios.post(backendUrl + '/api/auth/register', {name,email,password})
+                console.log('Sign up response:', data)
+                if(data.success){
+                    console.log('Sign up successful, navigating to home')
+                    setIsLoggedin(true)
+                    navigate('/')
+                } else {
+                    console.log('Sign up failed:', data.message)
+                    toast.error(data.message)
+                }
+            } else {
+                console.log('Attempting login...')
+                const {data} = await axios.post(backendUrl + '/api/auth/login', {email,password})
+                console.log('Login response:', data)
+                if(data.success){
+                    console.log('Login successful, navigating to home')
+                    setIsLoggedin(true)
+                    navigate('/')
+                } else {
+                    console.log('Login failed:', data.message)
+                    toast.error(data.message)
+                }
+            }
+        } catch (error) {
+            console.error('Request error:', error)
+            console.error('Error response:', error.response?.data)
+            toast.error(error.response?.data?.message || 'An error occurred')
+        }
+    }
 
   return (
     <div className='flex items-center justify-center min-h-screen px-6 sm:px-0 bg-gradient-to-br from-blue-200 to-purple-400'>
@@ -17,7 +61,7 @@ const login = () => {
         <div className='bg-slate-900 p-10 rounded-lg shadow-lg sm:w-96 text-indigo-300 text-sm'>
             <h2 className='text-3xl font-semibold text-white text-center mb-3'>{state === 'Sign Up'? 'Create Account': 'Login'}</h2>
             <p className='text-center text-sm mb-6'>{state === 'Sign Up'? 'Create your Account': 'Login to your Account'}</p>
-            <form>
+            <form onSubmit={onSubmitHandler}>
                 {state === 'Sign Up' && (
                     <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]'>
                     <img src={assets.person_icon} alt="" />
@@ -35,7 +79,11 @@ const login = () => {
                 </div>
 
                 <p onClick={()=>navigate('/reset-password')} className='mb-4 text-indigo-500 cursor-pointer'>Forgot Password?</p>
-                <button className='w-full py-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-900 cursor-pointer text-white font-medium'>{state}</button>
+                
+                {/* Fixed the button - added type="submit" explicitly */}
+                <button type="submit" className='w-full py-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-900 cursor-pointer text-white font-medium'>
+                    {state}
+                </button>
             </form>
             {state === 'Sign Up'? (
                 <p className='text-gray-400 text-center text-xs mt-4'>Already have an Account? {' '} <span className='text-blue-400 cursor-pointer underline' onClick={()=>setState('Login')}>Login here</span></p>

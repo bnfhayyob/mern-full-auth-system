@@ -54,11 +54,11 @@ export const login = async (req,res) => {
     try {
         const user = await userModel.findOne({email})
         if(!user){
-            res.json({success:false,message:"Invalid email!"})
+           return res.json({success:false,message:"Invalid email!"})
         }
         const isMatch = await bcrypt.compare(password,user.password)
         if(!isMatch){
-            res.json({success:false,message:"Invalid password!"})
+           return res.json({success:false,message:"Invalid password!"})
         }
         const token = jwt.sign({id:user._id},process.env.JWT_SECRET, {expiresIn:'7d'})
         res.cookie('token',token, {
@@ -67,7 +67,7 @@ export const login = async (req,res) => {
             sameSite:process.env.NODE_ENV === 'production'?'none':'strict',
             maxAge:7*24*60*60*1000
         })
-        return res.json({sucess:true})
+        return res.json({success:true})
     } catch (error) {
         return res.json({success:false,message:error.message})
     }

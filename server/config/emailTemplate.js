@@ -217,4 +217,3 @@ export const PASSWORD_RESET_TEMPLATE = `
 </body>
 </html>
 `
-

@@ -23,7 +23,9 @@ const login = () => {
 
             if(state === 'Sign Up'){
                 const {data} = await axios.post(backendUrl + '/api/auth/register', {name,email,password})
-                if(data.success){
+                console.log(data);
+                
+                if(data.success || data.sucess){
                     setIsLoggedin(true)
                     getUserData()
                     navigate('/')
@@ -32,7 +34,7 @@ const login = () => {
                 }
             } else {
                 const {data} = await axios.post(backendUrl + '/api/auth/login', {email,password})
-                if(data.success){
+                if(data.success || data.sucess){
                     setIsLoggedin(true)
                     getUserData()
                     navigate('/')
@@ -70,7 +72,6 @@ const login = () => {
 
                 <p onClick={()=>navigate('/reset-password')} className='mb-4 text-indigo-500 cursor-pointer'>Forgot Password?</p>
                 
-                {/* Fixed the button - added type="submit" explicitly */}
                 <button type="submit" className='w-full py-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-900 cursor-pointer text-white font-medium'>
                     {state}
                 </button>
